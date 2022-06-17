@@ -32,11 +32,10 @@ public class BotStateContext {
 
     private boolean isFillingOrderState(BotState currentState){
         switch (currentState){
-            case ASK_WIDTH:
-            case ASK_HEIGHT:
-            case ASK_PHOTO:
-            case ASK_BACKGROUND:
-            case ASK_SONG:
+            case ASK_SET:
+            case ASK_SIZE:
+            case ASK_POWER_SUPPLY:
+            case ASK_SIGN:
             case FILLING_ORDER:
             case ORDER_FILLED:
                 return true;

@@ -1,8 +1,13 @@
 package com.chatbot.PosterBot.botapi;
 
+import com.chatbot.PosterBot.PosterBot;
 import com.chatbot.PosterBot.cache.UserDataCacheImpl;
+import com.chatbot.PosterBot.service.keyboard.MainMenuService;
+import com.chatbot.PosterBot.service.message.ReplyMessageService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -13,26 +18,35 @@ public class TelegramFacade {
 
     private final UserDataCacheImpl userDataCache;
     private final BotStateContext botStateContext;
+    private final MainMenuService mainMenuService;
+    private final PosterBot posterBot;
+    private final ReplyMessageService replyMessageService;
 
-    public TelegramFacade(UserDataCacheImpl userDataCache, BotStateContext botStateContext) {
+    public TelegramFacade(UserDataCacheImpl userDataCache, BotStateContext botStateContext, MainMenuService mainMenuService,
+                          @Lazy PosterBot posterBot, ReplyMessageService replyMessageService) {
         this.userDataCache = userDataCache;
         this.botStateContext = botStateContext;
+        this.mainMenuService = mainMenuService;
+        this.posterBot = posterBot;
+        this.replyMessageService = replyMessageService;
     }
 
-    public SendMessage handleUpdate(Update update) {
+    public BotApiMethod<?> handleUpdate(Update update) {
         SendMessage replyMessage = null;
 
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
-            log.info("New message from User:{}, chatId:{}, with text:{}", message.getFrom().getUserName(), message.getChatId(), message.getText());
+            log.info("New message from User:{}, userId: {}, chatId: {},  with text: {}",
+                    message.getFrom().getUserName(), message.getFrom().getId(), message.getChatId(), message.getText());
             replyMessage = handleInputMessage(message);
         }
+
         return replyMessage;
     }
 
     private SendMessage handleInputMessage(Message message) {
         String inputMessage = message.getText();
-        int userId = Math.toIntExact(message.getFrom().getId());
+        int chatId = Math.toIntExact(message.getFrom().getId());
         BotState botState;
         SendMessage replyMessage;
 
@@ -40,19 +54,22 @@ public class TelegramFacade {
             case "/start":
                 botState = BotState.SHOW_MAIN_MENU;
                 break;
-            case "/order":
+            case "Оформити замовлення":
+                posterBot.sendPhoto(chatId, "static/images/Постер + пластик.jpg");
+                posterBot.sendPhoto(chatId, "static/images/Постер + дерево.jpg");
+                posterBot.sendPhoto(chatId, "static/images/Постер + біла підсвітка.jpg");
+                posterBot.sendPhoto(chatId, "static/images/Постер + кольорова підсвітка.jpg");
+                posterBot.sendPhoto(chatId, "static/images/Постер + кольорова підсвітка з колонкою.jpg");
                 botState = BotState.FILLING_ORDER;
                 break;
-            case "/pay":
-                botState = BotState.ORDER_FILLED;
-            case "/help":
-                botState = BotState.HELP;
+            case "Зв'язатись з менеджером":
+                botState = BotState.CONTACT_WITH_MANAGER;
                 break;
             default:
-                botState = userDataCache.getUsersCurrentBotState(userId);
+                botState = userDataCache.getUsersCurrentBotState(chatId);
         }
 
-        userDataCache.setUsersCurrentBotState(userId, botState);
+        userDataCache.setUsersCurrentBotState(chatId, botState);
 
         replyMessage = botStateContext.processInputMessage(botState, message);
 

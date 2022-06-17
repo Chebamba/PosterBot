@@ -8,10 +8,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Order {
 
-    String song;
-    String background;
-    String photo;
-    int height;
-    int width;
-    double price;
+    String sign;
+    String set;
+    String size;
+    String powerSupply;
+    long chatId;
 }

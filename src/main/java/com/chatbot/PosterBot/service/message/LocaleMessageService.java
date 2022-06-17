@@ -1,4 +1,4 @@
-package com.chatbot.PosterBot.service;
+package com.chatbot.PosterBot.service.message;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;

@@ -3,9 +3,19 @@ package com.chatbot.PosterBot;
 import com.chatbot.PosterBot.botapi.TelegramFacade;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
+import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 
 @Setter
 @Getter
@@ -44,17 +54,14 @@ public class PosterBot extends TelegramWebhookBot {
 
         return replyMessageToUser;
     }
-}
-//
-//        if (update.getMessage() != null && update.getMessage().hasText()) {
-//            if (update.getMessage().getText().equals("/start")) {
-//                try {
-//                    execute(menu1Service.mainMenuService1(update.getMessage().getChatId()));
-//                    execute(menuService.getMainMenuMessage(update.getMessage().getChatId(), "Привіт! Я - PosterBot \uD83E\uDD16 \n" +
-//                            "Допоможу вибрати дизайн та оформити замовлення для твого постеру"));
-//
-//                } catch (TelegramApiException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
+
+    @SneakyThrows
+    public void sendPhoto(long chatId, String imagePath){
+        File image = ResourceUtils.getFile("classpath:" + imagePath);
+            SendPhoto sendPhoto = new SendPhoto();
+            sendPhoto.setPhoto(new InputFile(image));
+            sendPhoto.setChatId(String.valueOf(chatId));
+            execute(sendPhoto);
+
+        }
+    }

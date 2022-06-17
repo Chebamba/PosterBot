@@ -1,4 +1,4 @@
-package com.chatbot.PosterBot.service;
+package com.chatbot.PosterBot.service.keyboard;
 
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,15 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class OrderMenuService {
+public class MainMenuService {
 
-    public SendMessage getOrderMenuMessage(final long chatId, final String textMessage) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = getOrderMenuKeyboard();
-        SendMessage orderMenuMessage = createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
-        return orderMenuMessage;
+    public SendMessage getMainMenuMessage(final long chatId, final String textMessage) {
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard();
+        final SendMessage mainMenuMessage =
+                createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
+
+        return mainMenuMessage;
     }
 
-    private ReplyKeyboardMarkup getOrderMenuKeyboard() {
+    private ReplyKeyboardMarkup getMainMenuKeyboard() {
 
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
@@ -28,22 +30,11 @@ public class OrderMenuService {
         List<KeyboardRow> keyboard = new ArrayList<>();
 
         KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        KeyboardRow row4 = new KeyboardRow();
-        KeyboardRow row5 = new KeyboardRow();
-
-        row1.add(new KeyboardButton("Вибрати ширину"));
-        row2.add(new KeyboardButton("Вибрати висоту"));
-        row3.add(new KeyboardButton("Вибрати фон"));
-        row4.add(new KeyboardButton("Вибрати фото"));
-        row5.add(new KeyboardButton("Вибрати пісню"));
+        row1.add(new KeyboardButton("Оформити замовлення"));
+        row1.add(new KeyboardButton("Зв'язатись з менеджером"));
 
         keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
-        keyboard.add(row4);
-        keyboard.add(row5);
+
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
@@ -54,10 +45,9 @@ public class OrderMenuService {
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(String.valueOf(chatId));
         sendMessage.setText(textMessage);
-        if(replyKeyboardMarkup != null){
+        if (replyKeyboardMarkup != null) {
             sendMessage.setReplyMarkup(replyKeyboardMarkup);
         }
         return sendMessage;
     }
-
 }

@@ -1,5 +1,6 @@
-package com.chatbot.PosterBot.service;
+package com.chatbot.PosterBot.service.message;
 
+import com.chatbot.PosterBot.service.message.LocaleMessageService;
 import com.chatbot.PosterBot.util.Emojis;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
