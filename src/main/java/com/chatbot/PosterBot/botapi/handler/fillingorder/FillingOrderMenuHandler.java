@@ -7,7 +7,9 @@ import com.chatbot.PosterBot.model.Order;
 import com.chatbot.PosterBot.service.keyboard.PosterSetMenuService;
 import com.chatbot.PosterBot.service.OrderService;
 import com.chatbot.PosterBot.service.keyboard.PostersSizeMenuService;
+import com.chatbot.PosterBot.service.keyboard.YesOrNoService;
 import com.chatbot.PosterBot.service.message.ReplyMessageService;
+import com.chatbot.PosterBot.validation.PosterSetValidator;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -20,14 +22,24 @@ public class FillingOrderMenuHandler implements InputMessageHandler {
     private final UserDataCache userDataCache;
     private final PostersSizeMenuService postersSizeMenuService;
     private final PosterSetMenuService posterSetMenuService;
+    private final YesOrNoService yesOrNoService;
+    private final PosterSetValidator posterSetValidator;
+    private final ColorOrderScenarioHandler colorOrderScenarioHandler;
+    private final PlasticOrderScenarioHandler plasticOrderScenarioHandler;
+    private final WoodenOrderScenarioHandler woodenOrderScenarioHandler;
 
     public FillingOrderMenuHandler(OrderService orderService, ReplyMessageService messageService, UserDataCache userDataCache,
-                                   PostersSizeMenuService postersSizeMenuService, PosterSetMenuService posterSetMenuService) {
+                                   PostersSizeMenuService postersSizeMenuService, PosterSetMenuService posterSetMenuService, YesOrNoService yesOrNoService, PosterSetValidator posterSetValidator, ColorOrderScenarioHandler colorOrderScenarioHandler, PlasticOrderScenarioHandler plasticOrderScenarioHandler, WoodenOrderScenarioHandler woodenOrderScenarioHandler) {
         this.orderService = orderService;
         this.messageService = messageService;
         this.userDataCache = userDataCache;
         this.postersSizeMenuService = postersSizeMenuService;
         this.posterSetMenuService = posterSetMenuService;
+        this.yesOrNoService = yesOrNoService;
+        this.posterSetValidator = posterSetValidator;
+        this.colorOrderScenarioHandler = colorOrderScenarioHandler;
+        this.plasticOrderScenarioHandler = plasticOrderScenarioHandler;
+        this.woodenOrderScenarioHandler = woodenOrderScenarioHandler;
     }
 
     @Override
@@ -55,45 +67,56 @@ public class FillingOrderMenuHandler implements InputMessageHandler {
 
         if(botState.equals(BotState.ASK_SET)){
             replyToUser = posterSetMenuService.getOrderMenuMessage(chatId, messageService.getReplyText("reply.askSet"));
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_SIZE);
-        }
-
-        if(botState.equals(BotState.ASK_SIZE)){
             usersOrderData.setSet(usersAnswer);
-            replyToUser = postersSizeMenuService.getPosterSizeMenuMessage(chatId, messageService.getReplyText("reply.askSize"), usersAnswer);
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_POWER_SUPPLY);
+            String posterSet = posterSetValidator.containsPosterSet(messageService.getReplyText(usersAnswer));
+            switch(posterSet){
+                case "Plastic":
+                    plasticOrderScenarioHandler.handlePlasticOrderScenario(usersInput);
+                    break;
+                case "Wooden":
+                    woodenOrderScenarioHandler.handleWoodenOrderHandle(usersInput);
+                    break;
+                case "Color":
+                    colorOrderScenarioHandler.handleColorOrderScenario(usersInput);
+                    break;
+            }
+//            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_SIZE);
         }
-
-        if(botState.equals(BotState.ASK_POWER_SUPPLY)){
-            usersOrderData.setSize(usersAnswer);
-            replyToUser = messageService.getReplyMessage(chatId, "reply.askPowerSupply");
-
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_SIGN);
-        }
-
-        if(botState.equals(BotState.ASK_SIGN)){
-            usersOrderData.setPowerSupply(usersAnswer);
-            replyToUser = messageService.getReplyMessage(chatId, "reply.askSign");
-            userDataCache.setUsersCurrentBotState(userId, BotState.ORDER_FILLED);
-        }
-
-        if(botState.equals(BotState.ORDER_FILLED)){
-            usersOrderData.setSign(usersAnswer);
-            usersOrderData.setChatId(chatId);
-
-            //законектити бд і засейвити ордер
-//            orderService.saveOrder(usersOrderData);
-
-            //добавити payment після оформлення замовлення
-            userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
-
-            //можливо добавити номер оформлення
-            String profileFilledMessage = messageService.getReplyText("reply.profileFilled");
-
-            replyToUser = new SendMessage(String.valueOf(chatId), profileFilledMessage);
-        }
-
-        userDataCache.saveUserOrderData(userId, usersOrderData);
+//
+//        if(botState.equals(BotState.ASK_SIZE)){
+//            replyToUser = postersSizeMenuService.getPosterSizeMenuMessage(chatId, messageService.getReplyText("reply.askSize"), usersAnswer);
+//            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_POWER_SUPPLY);
+//        }
+//
+//        if(botState.equals(BotState.ASK_POWER_SUPPLY)){
+//            usersOrderData.setSize(usersAnswer);
+//            replyToUser = yesOrNoService.getYesOrNoMenuMessage(chatId, messageService.getReplyText("reply.askPowerSupply"));
+//            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_SIGN);
+//        }
+//
+//        if(botState.equals(BotState.ASK_SIGN)){
+//            usersOrderData.setPowerSupply(usersAnswer);
+//            replyToUser = yesOrNoService.getYesOrNoMenuMessage(chatId, messageService.getReplyText("reply.askSign"));
+//            userDataCache.setUsersCurrentBotState(userId, BotState.ORDER_FILLED);
+//        }
+//
+//        if(botState.equals(BotState.ORDER_FILLED)){
+//            usersOrderData.setSign(usersAnswer);
+//            usersOrderData.setChatId(chatId);
+//
+//            //законектити бд і засейвити ордер
+////            orderService.saveOrder(usersOrderData);
+//
+//            //добавити payment після оформлення замовлення
+//            userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
+//
+//            //можливо добавити номер оформлення
+//            String orderFilledMessage = messageService.getReplyText("reply.orderFilled");
+//
+//            replyToUser = new SendMessage(String.valueOf(chatId), orderFilledMessage);
+//        }
+//
+//        userDataCache.saveUserOrderData(userId, usersOrderData);
 
         return replyToUser;
     }
