@@ -1,6 +1,7 @@
 package com.chatbot.PosterBot.botapi.handler.fillingorder;
 
 import com.chatbot.PosterBot.botapi.BotState;
+import com.chatbot.PosterBot.botapi.InputMessageHandler;
 import com.chatbot.PosterBot.cache.UserDataCache;
 import com.chatbot.PosterBot.model.Order;
 import com.chatbot.PosterBot.service.keyboard.PostersSizeMenuService;
@@ -11,7 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Component
-public class PlasticOrderScenarioHandler{
+public class PlasticOrderScenarioHandler implements InputMessageHandler {
 
     private final ReplyMessageService replyMessageService;
     private final PostersSizeMenuService postersSizeMenuService;
@@ -27,13 +28,19 @@ public class PlasticOrderScenarioHandler{
         this.validator = validator;
     }
 
+    @Override
+    public SendMessage handle(Message message) {
+        return handlePlasticOrderScenario(message);
+    }
+
+    @Override
     public BotState getHandlerName() {
         return BotState.FILLING_PLASTIC_ORDER;
     }
 
-    public SendMessage handlePlasticOrderScenario(Message usersInput){
+    private SendMessage handlePlasticOrderScenario(Message usersInput){
         String usersAnswer = usersInput.getText();
-        SendMessage replyToUser;
+        SendMessage replyToUser = null;
         long chatId = usersInput.getChatId();
         int userId = Math.toIntExact(usersInput.getFrom().getId());
 

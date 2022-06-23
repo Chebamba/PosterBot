@@ -1,24 +1,17 @@
 package com.chatbot.PosterBot.service.keyboard;
 
-import com.chatbot.PosterBot.service.message.ReplyMessageService;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class PostersSizeMenuService {
-
-    private final Map<String, ReplyKeyboardMarkup> postersSizeMap = new HashMap<>();
-    private final ReplyMessageService replyMessageService;
-
-    public PostersSizeMenuService(ReplyMessageService replyMessageService) {
-        this.replyMessageService = replyMessageService;
-    }
 
     public SendMessage getPosterSizeMenuMessage(final long chatId, final String textMessage, final String usersAnswer) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = getPostersSizeKeyboard(usersAnswer);

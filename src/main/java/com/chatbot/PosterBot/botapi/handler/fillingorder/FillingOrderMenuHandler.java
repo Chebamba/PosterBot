@@ -63,25 +63,28 @@ public class FillingOrderMenuHandler implements InputMessageHandler {
         Order usersOrderData = userDataCache.getUserOrderData(userId);
         BotState botState = userDataCache.getUsersCurrentBotState(userId);
 
-        SendMessage replyToUser = null;
+        SendMessage replyToUser;
 
-        if(botState.equals(BotState.ASK_SET)){
+
             replyToUser = posterSetMenuService.getOrderMenuMessage(chatId, messageService.getReplyText("reply.askSet"));
+            String posterSet = posterSetValidator.containsPosterSet(usersAnswer);
             usersOrderData.setSet(usersAnswer);
-            String posterSet = posterSetValidator.containsPosterSet(messageService.getReplyText(usersAnswer));
             switch(posterSet){
                 case "Plastic":
-                    plasticOrderScenarioHandler.handlePlasticOrderScenario(usersInput);
+                    replyToUser = plasticOrderScenarioHandler.handle(usersInput);
                     break;
                 case "Wooden":
-                    woodenOrderScenarioHandler.handleWoodenOrderHandle(usersInput);
+                    replyToUser = woodenOrderScenarioHandler.handle(usersInput);
                     break;
                 case "Color":
-                    colorOrderScenarioHandler.handleColorOrderScenario(usersInput);
+                    replyToUser = colorOrderScenarioHandler.handle(usersInput);
                     break;
             }
 //            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_SIZE);
-        }
+
+        return replyToUser;
+    }
+}
 //
 //        if(botState.equals(BotState.ASK_SIZE)){
 //            replyToUser = postersSizeMenuService.getPosterSizeMenuMessage(chatId, messageService.getReplyText("reply.askSize"), usersAnswer);
@@ -117,7 +120,3 @@ public class FillingOrderMenuHandler implements InputMessageHandler {
 //        }
 //
 //        userDataCache.saveUserOrderData(userId, usersOrderData);
-
-        return replyToUser;
-    }
-}

@@ -1,6 +1,7 @@
 package com.chatbot.PosterBot.botapi.handler.fillingorder;
 
 import com.chatbot.PosterBot.botapi.BotState;
+import com.chatbot.PosterBot.botapi.InputMessageHandler;
 import com.chatbot.PosterBot.cache.UserDataCache;
 import com.chatbot.PosterBot.model.Order;
 import com.chatbot.PosterBot.service.keyboard.PostersSizeMenuService;
@@ -12,7 +13,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Component
-public class ColorOrderScenarioHandler{
+public class ColorOrderScenarioHandler implements InputMessageHandler {
 
     private final ReplyMessageService replyMessageService;
     private final PostersSizeMenuService postersSizeMenuService;
@@ -28,11 +29,17 @@ public class ColorOrderScenarioHandler{
         this.validator = validator;
     }
 
+    @Override
+    public SendMessage handle(Message message) {
+        return handleColorOrderScenario(message);
+    }
+
+    @Override
     public BotState getHandlerName() {
         return BotState.FILLING_COLOR_ORDER;
     }
 
-    public SendMessage handleColorOrderScenario(Message usersInput){
+    private SendMessage handleColorOrderScenario(Message usersInput){
         String usersAnswer = usersInput.getText();
         SendMessage replyToUser;
         long chatId = usersInput.getChatId();
