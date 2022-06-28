@@ -1,5 +1,6 @@
 package com.chatbot.PosterBot.botapi;
 
+import com.chatbot.PosterBot.validation.PosterSetValidator;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -11,7 +12,7 @@ import java.util.Map;
 @Component
 public class BotStateContext {
 
-    private Map<BotState, InputMessageHandler> messageHandlers = new HashMap<>();
+    private final Map<BotState, InputMessageHandler> messageHandlers = new HashMap<>();
 
     public BotStateContext(List<InputMessageHandler> messageHandlers) {
         messageHandlers.forEach(handler -> this.messageHandlers.put(handler.getHandlerName(), handler));
@@ -33,9 +34,13 @@ public class BotStateContext {
     private boolean isFillingOrderState(BotState currentState){
         switch (currentState){
             case ASK_SET:
-            case ASK_SIZE:
-            case ASK_POWER_SUPPLY:
-            case ASK_SIGN:
+            case FILLING_PLASTIC_ORDER:
+            case FILLING_WOODEN_ORDER:
+            case FILLING_COLOR_ORDER:
+//            case ASK_SIZE:
+//            case ASK_POWER_SUPPLY:
+//            case ASK_SIGN:
+//            case ADD_SIGN:
             case FILLING_ORDER:
             case ORDER_FILLED:
                 return true;

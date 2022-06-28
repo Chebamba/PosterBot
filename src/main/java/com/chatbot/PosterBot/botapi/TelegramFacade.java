@@ -18,17 +18,14 @@ public class TelegramFacade {
 
     private final UserDataCacheImpl userDataCache;
     private final BotStateContext botStateContext;
-    private final MainMenuService mainMenuService;
     private final PosterBot posterBot;
-    private final ReplyMessageService replyMessageService;
 
-    public TelegramFacade(UserDataCacheImpl userDataCache, BotStateContext botStateContext, MainMenuService mainMenuService,
-                          @Lazy PosterBot posterBot, ReplyMessageService replyMessageService) {
+
+    public TelegramFacade(UserDataCacheImpl userDataCache, BotStateContext botStateContext,
+                          @Lazy PosterBot posterBot) {
         this.userDataCache = userDataCache;
         this.botStateContext = botStateContext;
-        this.mainMenuService = mainMenuService;
         this.posterBot = posterBot;
-        this.replyMessageService = replyMessageService;
     }
 
     public BotApiMethod<?> handleUpdate(Update update) {

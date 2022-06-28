@@ -8,9 +8,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Order {
 
-    String sign;
+    boolean sign;
     String set;
     String size;
-    String powerSupply;
+    boolean powerSupply;
     long chatId;
 }

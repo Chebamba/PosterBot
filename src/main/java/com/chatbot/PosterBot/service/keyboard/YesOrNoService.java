@@ -12,10 +12,10 @@ import java.util.List;
 @Service
 public class YesOrNoService {
 
-    public SendMessage getYesOrNoMenuMessage(long chatId) {
+    public SendMessage getYesOrNoMenuMessage(final long chatId, final String textMessage) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = getYesOrNoMenuKeyboard();
         final SendMessage YesOrNoMenuMessage =
-                createMessageWithKeyboard(chatId, replyKeyboardMarkup);
+                createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
         return YesOrNoMenuMessage;
     }
 
@@ -30,10 +30,11 @@ public class YesOrNoService {
         return replyKeyboardMarkup;
     }
 
-    private SendMessage createMessageWithKeyboard(long chatId, ReplyKeyboardMarkup replyKeyboardMarkup) {
+    private SendMessage createMessageWithKeyboard(long chatId, String textMessage, ReplyKeyboardMarkup replyKeyboardMarkup) {
         final SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(String.valueOf(chatId));
+        sendMessage.setText(textMessage);
         if (replyKeyboardMarkup != null) {
             sendMessage.setReplyMarkup(replyKeyboardMarkup);
         }
